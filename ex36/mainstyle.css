@@ -1,0 +1,45 @@
+.wrap {
+  display: flex;
+  gap: 28px;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 12px 0;
+}
+
+.card {
+  width: 280px;
+}
+
+h3 {
+  height: 50px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: url("images/h3.png") no-repeat 0 100%;
+  text-indent: -9999px;
+  overflow: hidden;
+}
+
+ul {
+  margin: 0;
+  padding: 10px 10px 25px 45px;
+  background: url("images/ul.png") no-repeat 0 100%;
+  list-style-image: url("images/li.png");
+}
+
+a:link {
+  color: blue;
+}
+
+a:visited {
+  color: green;
+}
+
+a:hover {
+  color: hotpink;
+  padding-left: 10px;
+}
+
+a:active {
+  color: blue;
+}

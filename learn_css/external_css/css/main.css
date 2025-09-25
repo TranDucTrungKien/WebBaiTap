@@ -1,0 +1,19 @@
+    body {
+      margin: 0;
+      height: 100vh;
+      background-image: url("../images/MU.jpg");
+      background-size: cover;        
+      background-position: center;
+      font-family: Arial, sans-serif;
+      color: white;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    h1 {
+      background: rgba(0,0,0,0.5);
+      padding: 10px 20px;
+      border-radius: 10px;
+    }
