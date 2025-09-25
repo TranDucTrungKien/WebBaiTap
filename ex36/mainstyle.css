@@ -1,13 +1,6 @@
-.wrap {
-  display: flex;
-  gap: 28px;
-  justify-content: flex-start;
-  align-items: flex-start;
-  padding: 12px 0;
-}
-
 .card {
   width: 280px;
+  margin: 0 auto;
 }
 
 h3 {
