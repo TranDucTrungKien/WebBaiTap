@@ -1,0 +1,73 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f7f7f7;
+  padding: 24px;
+}
+
+/*Khung*/
+#container {
+  border: 1px solid #1e429f;
+  background: #61677a;
+  display: inline-block;
+}
+
+/*main*/
+#container .main {
+  list-style: none;
+  display: flex;
+}
+#container .main > li {
+  position: relative;
+}
+
+#container .main > li > a {
+  display: block;
+  padding: .6em 12px;
+  color: #e9edf5;
+  text-decoration: none;
+  font-weight: bold;
+  letter-spacing: .3px;
+  background: #64656f;
+  border-right: 1px solid #1e429f;
+}
+#container .main > li:hover > a {
+  color: #fff;
+  background: #ff9500;
+}
+
+/*sub*/
+#container .sub {
+  list-style: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 220px;
+  background: #ffffff;
+  border: 1px solid #2ea043;
+  display: none;           
+  z-index: 20;
+}
+#container .has-sub:hover > .sub {
+  display: block;
+}
+#container .sub > li > a {
+  display: block;
+  padding: 10px 14px;
+  color: #111;
+  text-decoration: none;
+  border-bottom: 1px solid #e6f3e6;
+}
+#container .sub > li > a:hover {
+  background: #f2fff2;
+  color: #0a7c0a;
+  padding-left: 20px;
+}
+#container .sub > li:last-child > a {
+  border-bottom: 0;
+}
+@media (max-width: 680px) {
+  #container .main { flex-wrap: wrap; }
+  #container .main > li > a { padding: .55em 10px; }
+}
