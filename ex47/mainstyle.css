@@ -1,0 +1,24 @@
+table {
+    border-collapse: collapse;
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+thead, tfoot {
+    background-color: cornflowerblue;
+    color: white;
+    font-weight: bold;
+}
+
+tbody tr:nth-child(odd) {
+    background-color: whitesmoke;
+}
+
+tbody tr:nth-child(even) {
+    background-color: pink;
+}
+
+tbody tr:hover {
+    background-color: crimson;
+    cursor: pointer;
+}

@@ -1,0 +1,70 @@
+body{
+    color: green;
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+h1,h2{
+    color: #977a2b;
+}
+h1,h2,h3,h4,h5,h6{ 
+    font-family: Arial, Helvetica, sans-serif; 
+}
+
+address{
+    font-size: .9em;
+    font-style: italic;
+    text-align: left;
+    text-transform: uppercase;
+    margin-top: 2rem;
+}
+
+blockquote{
+    background-color: #dbeed2;
+    border: 1px solid #b7d5a0;
+    padding: .6em .8em;
+    margin: .6em 0;
+}
+ul{
+    list-style-type: circle;
+    list-style-image: url("images/Apple.jpg");
+    list-style-position: outside;
+    padding-left: 28px;
+}
+
+ul b{ color: rgb(155,0,0);
+}
+
+a{
+    font-size: .9em; 
+    color: rgb(74, 40, 188); 
+}
+
+a:hover{
+    color: red;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.special{ 
+    color: rgb(153,102,6); 
+    font-weight: bold; 
+}
+
+.article{
+    padding: .5em;
+    border: 2px solid #977a2b;
+    background-color: rgb(252,221,163);
+    width: 250px;
+    float: right;
+    margin: 0 0 .75rem 1rem;
+}
+
+.clear{ 
+    clear: both;
+}
+.footer-line{
+    height: 3px;
+    background: #5c77b3;
+    margin-top: 14px;
+    width: 100%;
+}
