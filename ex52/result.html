@@ -2,31 +2,12 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Contact Result</title>
+	<title>Contact Result - Kjn Tran</title>
 	<link rel="stylesheet" href="mainstyle.css">
-	<style>
-		.result {
-			width: 600px;
-			margin: 40px auto;
-			background-color: #fff;
-			border: 1px solid #ccc;
-			padding: 20px 30px;
-			box-shadow: 0 0 5px rgba(0,0,0,0.2);
-		}
-		h2 {
-			color: #444;
-		}
-		p {
-			margin: 10px 0;
-		}
-		strong {
-			color: #b23b6b;
-		}
-	</style>
 </head>
 <body>
 	<div class="result">
-		<h2>Form Data Received (GET Method)</h2>
+		<h2>Form Data Received</h2>
 		<script>
 			const params = new URLSearchParams(window.location.search);
 			document.write(`<p><strong>Full name:</strong> ${params.get("fullname")}</p>`);
