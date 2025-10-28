@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSS_Kjn Tran</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #E63946;
+            --primary-dark: #C1121F;
+            --accent: #F77F00;
+            --dark: #1D3557;
+            --light: #F1FAEE;
+            --text: #2B2D42;
+            --border: #8D99AE;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: #F8F9FA;
+            color: var(--text);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR LAYOUT */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, var(--dark) 0%, #0F2137 100%);
+            padding: 40px 30px;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+            z-index: 100;
+            overflow-y: auto;
+        }
+
+        .sidebar .logo {
+            font-size: 3.5em;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: rotate 4s ease-in-out infinite;
+        }
+
+        @keyframes rotate {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(10deg); }
+        }
+
+        .sidebar h1 {
+            color: white;
+            font-size: 1.8em;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .sidebar p {
+            color: var(--light);
+            text-align: center;
+            font-size: 0.9em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .sidebar .divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            margin: 25px 0;
+        }
+
+        .update-info {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 20px;
+        }
+
+        .update-info span {
+            color: white;
+            font-size: 0.85em;
+            display: block;
+            text-align: center;
+        }
+
+        .stats {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stats h3 {
+            color: var(--accent);
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-item {
+            color: white;
+            margin: 10px 0;
+            font-size: 0.85em;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 30px;
+        }
+
+        .content-header {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            border-left: 5px solid var(--primary);
+        }
+
+        .content-header h2 {
+            color: var(--dark);
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .content-header .subtitle {
+            color: var(--border);
+            font-size: 1em;
+        }
+
+        /* Loading state */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .loading::before {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 20px;
+            border: 4px solid var(--light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        /* MAGAZINE GRID LAYOUT */
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        /* Featured card - large */
+        .news-card:first-child {
+            grid-column: span 8;
+            grid-row: span 2;
+        }
+
+        .news-card:first-child .news-image-wrapper {
+            height: 450px;
+        }
+
+        .news-card:first-child .news-title {
+            font-size: 2em;
+            -webkit-line-clamp: 3;
+        }
+
+        /* Secondary cards */
+        .news-card:nth-child(2),
+        .news-card:nth-child(3) {
+            grid-column: span 4;
+        }
+
+        /* Regular cards */
+        .news-card:nth-child(n+4) {
+            grid-column: span 4;
+        }
+
+        /* News Card */
+        .news-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .news-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .news-card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .news-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Image */
+        .news-image-wrapper {
+            position: relative;
+            width: 100%;
+            height: 220px;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--dark), var(--primary));
+        }
+
+        .news-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .news-card:hover .news-image {
+            transform: scale(1.08);
+        }
+
+        .news-image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.7) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .news-card:hover .news-image-overlay {
+            opacity: 1;
+        }
+
+        /* Content */
+        .news-content {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .news-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 12px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .news-description {
+            color: var(--border);
+            line-height: 1.6;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            font-size: 0.92em;
+            flex: 1;
+        }
+
+        /* Meta info */
+        .news-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid #E9ECEF;
+            margin-top: auto;
+        }
+
+        .news-date {
+            color: var(--border);
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        .news-category {
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.75em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Error state */
+        .error {
+            background: #FFF5F5;
+            color: var(--primary-dark);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 20px 0;
+            border: 2px solid var(--primary);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .news-card:first-child {
+                grid-column: span 12;
+            }
+            
+            .news-card:nth-child(2),
+            .news-card:nth-child(3) {
+                grid-column: span 6;
+            }
+            
+            .news-card:nth-child(n+4) {
+                grid-column: span 6;
+            }
+        }
+
+        @media (max-width: 968px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                padding: 30px 20px;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            body {
+                flex-direction: column;
+            }
+
+            .news-card:first-child .news-image-wrapper {
+                height: 300px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .news-grid {
+                gap: 20px;
+            }
+
+            .news-card:first-child,
+            .news-card:nth-child(2),
+            .news-card:nth-child(3),
+            .news-card:nth-child(n+4) {
+                grid-column: span 12;
+            }
+
+            .news-card:first-child .news-image-wrapper {
+                height: 250px;
+            }
+
+            .news-image-wrapper {
+                height: 200px;
+            }
+
+            .content-header h2 {
+                font-size: 1.5em;
+            }
+        }
+    
+    </style>
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo">📰</div>
+        <h1>VnExpress Kinh Doanh</h1>
+        <p>Cập nhật tin tức kinh tế mới nhất</p>
+        
+        <div class="divider"></div>
+        
+        <div class="update-info">
+            <span id="lastUpdate">Đang tải...</span>
+        </div>
+
+        <div class="stats">
+            <h3>📊 Thống kê</h3>
+            <div class="stat-item">📌 <span id="newsCount">0</span> tin tức</div>
+            <div class="stat-item">⚡ Cập nhật tự động</div>
+            <div class="stat-item">🔄 Làm mới mỗi 6 giờ</div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <div class="content-header">
+            <h2>Tin Tức Nổi Bật</h2>
+            <p class="subtitle">Các bài viết được cập nhật liên tục từ VnExpress</p>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="loading-text">Đang tải tin tức...</div>
+        </div>
+        <div id="error" class="error" style="display: none;"></div>
+        <div id="newsContainer" class="news-grid"></div>
+    </main>
+
+    <script>
+        // CORS Proxy để lấy RSS feed
+        const RSS_URL = 'https://vnexpress.net/rss/kinh-doanh.rss';
+        const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+
+        // Lưu ngày cập nhật cuối cùng
+        const STORAGE_KEY = 'vnexpress_last_update';
+        const STORAGE_DATA_KEY = 'vnexpress_news_data';
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            return date.toLocaleDateString('vi-VN', options);
+        }
+
+        function extractImageFromDescription(description) {
+            const imgRegex = /<img[^>]+src="([^">]+)"/;
+            const match = description.match(imgRegex);
+            return match ? match[1] : null;
+        }
+
+        function stripHtml(html) {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = html;
+            return tmp.textContent || tmp.innerText || '';
+        }
+
+        function createNewsCard(item) {
+            const title = item.querySelector('title')?.textContent || 'Không có tiêu đề';
+            const link = item.querySelector('link')?.textContent || '#';
+            const description = item.querySelector('description')?.textContent || '';
+            const pubDate = item.querySelector('pubDate')?.textContent || '';
+            
+            const imageUrl = extractImageFromDescription(description);
+            const cleanDescription = stripHtml(description);
+
+            const card = document.createElement('a');
+            card.href = link;
+            card.target = '_blank';
+            card.className = 'news-card';
+
+            const placeholderSvg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%231D3557;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23E63946;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23grad)' width='400' height='300'/%3E%3Ctext fill='white' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='20' font-weight='bold' font-family='Arial'%3E📰 VnExpress%3C/text%3E%3C/svg%3E`;
+
+            card.innerHTML = `
+                <div class="news-image-wrapper">
+                    ${imageUrl ? `<img src="${imageUrl}" alt="${title}" class="news-image" onerror="this.src='${placeholderSvg}'">` : `<img src="${placeholderSvg}" alt="${title}" class="news-image">`}
+                    <div class="news-image-overlay"></div>
+                </div>
+                <div class="news-content">
+                    <h2 class="news-title">${title}</h2>
+                    <p class="news-description">${cleanDescription}</p>
+                    <div class="news-meta">
+                        <span class="news-date">${formatDate(pubDate)}</span>
+                        <span class="news-category">Kinh Doanh</span>
+                    </div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        function checkIfNeedUpdate() {
+            const lastUpdate = localStorage.getItem(STORAGE_KEY);
+            if (!lastUpdate) return true;
+
+            const lastUpdateDate = new Date(lastUpdate);
+            const today = new Date();
+            
+            // Kiểm tra nếu là ngày mới
+            return lastUpdateDate.toDateString() !== today.toDateString();
+        }
+
+        function saveNewsData(newsHtml) {
+            const today = new Date().toISOString();
+            localStorage.setItem(STORAGE_KEY, today);
+            localStorage.setItem(STORAGE_DATA_KEY, newsHtml);
+        }
+
+        function loadCachedNews() {
+            const cachedData = localStorage.getItem(STORAGE_DATA_KEY);
+            const lastUpdate = localStorage.getItem(STORAGE_KEY);
+            
+            if (cachedData && lastUpdate) {
+                const newsContainer = document.getElementById('newsContainer');
+                newsContainer.innerHTML = cachedData;
+                
+                const updateInfo = document.getElementById('lastUpdate');
+                updateInfo.textContent = `Cập nhật: ${formatDate(lastUpdate)}`;
+                
+                // Cập nhật số lượng tin
+                const newsCards = newsContainer.querySelectorAll('.news-card');
+                document.getElementById('newsCount').textContent = newsCards.length;
+                
+                return true;
+            }
+            return false;
+        }
+
+        async function fetchRSS() {
+            const loading = document.getElementById('loading');
+            const errorDiv = document.getElementById('error');
+            const newsContainer = document.getElementById('newsContainer');
+            const updateInfo = document.getElementById('lastUpdate');
+
+            try {
+                // Kiểm tra xem có cần cập nhật không
+                if (!checkIfNeedUpdate()) {
+                    if (loadCachedNews()) {
+                        loading.style.display = 'none';
+                        return;
+                    }
+                }
+
+                loading.style.display = 'block';
+                errorDiv.style.display = 'none';
+
+                const response = await fetch(CORS_PROXY + encodeURIComponent(RSS_URL));
+                
+                if (!response.ok) {
+                    throw new Error('Không thể tải RSS feed');
+                }
+
+                const text = await response.text();
+                const parser = new DOMParser();
+                const xml = parser.parseFromString(text, 'text/xml');
+
+                const items = xml.querySelectorAll('item');
+                
+                if (items.length === 0) {
+                    throw new Error('Không tìm thấy tin tức');
+                }
+
+                newsContainer.innerHTML = '';
+                
+                items.forEach(item => {
+                    const card = createNewsCard(item);
+                    newsContainer.appendChild(card);
+                });
+
+                // Cập nhật số lượng tin tức
+                document.getElementById('newsCount').textContent = items.length;
+
+                // Lưu dữ liệu vào localStorage
+                saveNewsData(newsContainer.innerHTML);
+
+                const now = new Date().toISOString();
+                updateInfo.textContent = `Cập nhật: ${formatDate(now)}`;
+                
+                loading.style.display = 'none';
+
+            } catch (error) {
+                console.error('Error:', error);
+                loading.style.display = 'none';
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = `❌ Lỗi: ${error.message}. Vui lòng thử lại sau.`;
+                
+                // Thử load dữ liệu cached nếu có lỗi
+                loadCachedNews();
+            }
+        }
+
+        // Tự động cập nhật mỗi 6 giờ
+        setInterval(() => {
+            if (checkIfNeedUpdate()) {
+                fetchRSS();
+            }
+        }, 6 * 60 * 60 * 1000);
+
+        // Load khi trang được mở
+        window.addEventListener('DOMContentLoaded', fetchRSS);
+    </script>
+</body>
+</html>
