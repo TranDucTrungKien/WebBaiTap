@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dự Báo Thời Tiết Việt Nam - Kjn Tran</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .selector-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .selector-section label {
+            font-size: 1.2em;
+            color: #555;
+            margin-right: 15px;
+            font-weight: 600;
+        }
+
+        #citySelect {
+            padding: 12px 20px;
+            font-size: 1.1em;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s;
+            min-width: 250px;
+        }
+
+        #citySelect:hover {
+            border-color: #764ba2;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        #citySelect:focus {
+            border-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2em;
+            color: #667eea;
+        }
+
+        .error {
+            text-align: center;
+            padding: 30px;
+            background: #fee;
+            border: 2px solid #fcc;
+            border-radius: 10px;
+            color: #c33;
+            margin: 20px 0;
+        }
+
+        .weather-container {
+            display: none;
+        }
+
+        .current-weather {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .current-weather h2 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .current-weather .temp {
+            font-size: 4em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .current-weather .description {
+            font-size: 1.5em;
+            text-transform: capitalize;
+            margin-bottom: 20px;
+        }
+
+        .current-details {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .detail-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px 25px;
+            border-radius: 10px;
+        }
+
+        .detail-item strong {
+            display: block;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .hourly-forecast {
+            margin-top: 30px;
+        }
+
+        .hourly-forecast h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+
+        .hourly-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .hour-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .hour-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .hour-card .time {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .hour-card .hour-temp {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        .hour-card .hour-desc {
+            font-size: 0.9em;
+            color: #555;
+            text-transform: capitalize;
+        }
+
+        .hour-card img {
+            width: 50px;
+            height: 50px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .current-weather .temp {
+                font-size: 3em;
+            }
+
+            .hourly-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌤️ Dự Báo Thời Tiết Việt Nam</h1>
+        
+        <div class="selector-section">
+            <label for="citySelect">Chọn tỉnh/thành phố:</label>
+            <select id="citySelect">
+                <option value="">-- Chọn địa điểm --</option>
+            </select>
+        </div>
+
+        <div id="loadingDiv" class="loading" style="display: none;">
+            ⏳ Đang tải dữ liệu thời tiết...
+        </div>
+
+        <div id="errorDiv" class="error" style="display: none;"></div>
+
+        <div id="weatherContainer" class="weather-container">
+            <div class="current-weather">
+                <h2 id="cityName"></h2>
+                <div class="temp" id="currentTemp"></div>
+                <div class="description" id="currentDesc"></div>
+                <img id="currentIcon" src="" alt="Weather Icon">
+                
+                <div class="current-details">
+                    <div class="detail-item">
+                        <strong>💧 Độ ẩm</strong>
+                        <span id="humidity"></span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>💨 Gió</strong>
+                        <span id="windSpeed"></span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>🌡️ Cảm giác</strong>
+                        <span id="feelsLike"></span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>👁️ Tầm nhìn</strong>
+                        <span id="visibility"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hourly-forecast">
+                <h3>Dự báo theo giờ</h3>
+                <div id="hourlyGrid" class="hourly-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dữ liệu tỉnh thành Việt Nam với ID từ cnnd.vn
+        const cities = [
+            {id: '2347719', name: 'An Giang'},
+            {id: '20070078', name: 'Bình Dương'},
+            {id: '20070086', name: 'Bình Phước'},
+            {id: '2347731', name: 'Bình Thuận'},
+            {id: '2347730', name: 'Bình Định'},
+            {id: '20070081', name: 'Bạc Liêu'},
+            {id: '20070087', name: 'Bắc Giang'},
+            {id: '20070084', name: 'Bắc Kạn'},
+            {id: '20070088', name: 'Bắc Ninh'},
+            {id: '2347703', name: 'Bến Tre'},
+            {id: '2347704', name: 'Cao Bằng'},
+            {id: '20070082', name: 'Cà Mau'},
+            {id: '2347732', name: 'Cần Thơ'},
+            {id: '28301718', name: 'Điện Biên'},
+            {id: '20070085', name: 'Đà Nẵng'},
+            {id: '1252375', name: 'Đà Lạt'},
+            {id: '2347720', name: 'Đắk Lắk'},
+            {id: '28301719', name: 'Đắk Nông'},
+            {id: '2347721', name: 'Đồng Nai'},
+            {id: '2347722', name: 'Đồng Tháp'},
+            {id: '2347733', name: 'Gia Lai'},
+            {id: '2347727', name: 'Hà Nội'},
+            {id: '2347728', name: 'TP. Hồ Chí Minh'},
+            {id: '2347734', name: 'Hà Giang'},
+            {id: '2347741', name: 'Hà Nam'},
+            {id: '2347736', name: 'Hà Tĩnh'},
+            {id: '2347737', name: 'Hòa Bình'},
+            {id: '20070079', name: 'Hưng Yên'},
+            {id: '20070080', name: 'Hải Dương'},
+            {id: '2347707', name: 'Hải Phòng'},
+            {id: '28301720', name: 'Hậu Giang'},
+            {id: '2347738', name: 'Khánh Hòa'},
+            {id: '2347723', name: 'Kiên Giang'},
+            {id: '20070076', name: 'Kon Tum'},
+            {id: '2347708', name: 'Lai Châu'},
+            {id: '2347710', name: 'Long An'},
+            {id: '2347740', name: 'Lào Cai'},
+            {id: '2347709', name: 'Lâm Đồng'},
+            {id: '2347718', name: 'Lạng Sơn'},
+            {id: '20070089', name: 'Nam Định'},
+            {id: '2347742', name: 'Nghệ An'},
+            {id: '2347743', name: 'Ninh Bình'},
+            {id: '2347744', name: 'Ninh Thuận'},
+            {id: '20070091', name: 'Phú Thọ'},
+            {id: '2347745', name: 'Phú Yên'},
+            {id: '2347746', name: 'Quảng Bình'},
+            {id: '2347711', name: 'Quảng Nam'},
+            {id: '20070077', name: 'Quảng Ngãi'},
+            {id: '2347712', name: 'Quảng Ninh'},
+            {id: '2347747', name: 'Quảng Trị'},
+            {id: '2347748', name: 'Sóc Trăng'},
+            {id: '2347713', name: 'Sơn La'},
+            {id: '2347715', name: 'Thanh Hóa'},
+            {id: '2347716', name: 'Thái Bình'},
+            {id: '20070083', name: 'Thái Nguyên'},
+            {id: '2347749', name: 'Thừa Thiên Huế'},
+            {id: '2347717', name: 'Tiền Giang'},
+            {id: '2347750', name: 'Trà Vinh'},
+            {id: '2347751', name: 'Tuyên Quang'},
+            {id: '2347714', name: 'Tây Ninh'},
+            {id: '2347752', name: 'Vĩnh Long'},
+            {id: '20070090', name: 'Vĩnh Phúc'},
+            {id: '2347729', name: 'Vũng Tàu'},
+            {id: '2347753', name: 'Yên Bái'}
+        ];
+
+        // API URL base
+        const WEATHER_API_BASE = 'https://utils3.cnnd.vn/ajax/weatherinfo/';
+        
+        // Khởi tạo dropdown
+        const citySelect = document.getElementById('citySelect');
+        cities.forEach(city => {
+            const option = document.createElement('option');
+            option.value = city.id;
+            option.textContent = city.name;
+            citySelect.appendChild(option);
+        });
+
+        // Xử lý khi chọn tỉnh thành
+        citySelect.addEventListener('change', async function() {
+            const cityId = this.value;
+            if (!cityId) return;
+            
+            const cityName = this.options[this.selectedIndex].text;
+            await getWeatherData(cityId, cityName);
+        });
+
+        // Hàm lấy dữ liệu thời tiết bằng cách sử dụng iframe proxy
+        async function getWeatherData(cityId, cityName) {
+            const loadingDiv = document.getElementById('loadingDiv');
+            const errorDiv = document.getElementById('errorDiv');
+            const weatherContainer = document.getElementById('weatherContainer');
+            
+            loadingDiv.style.display = 'block';
+            errorDiv.style.display = 'none';
+            weatherContainer.style.display = 'none';
+
+            try {
+                // Sử dụng iframe để fetch data
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent('https://utils3.cnnd.vn/ajax/weatherinfo/' + cityId + '.htm')}`;
+                
+                console.log('Fetching weather for:', cityName);
+                
+                const response = await fetch(proxyUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`Không thể lấy dữ liệu (Status: ${response.status})`);
+                }
+                
+                const result = await response.json();
+                const apiData = JSON.parse(result.contents);
+                
+                // Lấy dữ liệu từ cấu trúc đúng: Data.data.datainfo
+                if (!apiData.Data || !apiData.Data.data || !apiData.Data.data.datainfo) {
+                    throw new Error('Không tìm thấy dữ liệu thời tiết');
+                }
+                
+                const weatherInfo = apiData.Data.data.datainfo;
+                console.log('Weather info:', weatherInfo);
+                
+                displayWeather(weatherInfo, cityName);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                errorDiv.innerHTML = `❌ Lỗi: ${error.message}`;
+                errorDiv.style.display = 'block';
+            } finally {
+                loadingDiv.style.display = 'none';
+            }
+        }
+
+        // Hiển thị thông tin thời tiết
+        function displayWeather(weatherInfo, cityName) {
+            // Hiển thị thời tiết hiện tại
+            document.getElementById('cityName').textContent = cityName;
+            document.getElementById('currentTemp').textContent = weatherInfo.temperature + '°C';
+            document.getElementById('currentDesc').textContent = weatherInfo.status || 'Không rõ';
+            
+            // Icon thời tiết
+            const iconElement = document.getElementById('currentIcon');
+            if (weatherInfo.shadow_icon) {
+                iconElement.src = weatherInfo.shadow_icon;
+                iconElement.style.display = 'block';
+            } else {
+                iconElement.style.display = 'none';
+            }
+            
+            // Chi tiết thời tiết
+            document.getElementById('humidity').textContent = weatherInfo.humidity || 'N/A';
+            document.getElementById('windSpeed').textContent = weatherInfo.wind ? `${weatherInfo.wind.index} ${weatherInfo.wind.unit}` : 'N/A';
+            document.getElementById('feelsLike').textContent = weatherInfo.feels_like ? `${weatherInfo.feels_like}°C` : 'N/A';
+            document.getElementById('visibility').textContent = weatherInfo.visibility ? `${weatherInfo.visibility.index} ${weatherInfo.visibility.unit}` : 'N/A';
+
+            // Hiển thị dự báo theo giờ
+            const hourlyGrid = document.getElementById('hourlyGrid');
+            hourlyGrid.innerHTML = '';
+            
+            if (weatherInfo.hourly_temperature && weatherInfo.hourly_temperature.length > 0) {
+                weatherInfo.hourly_temperature.forEach(item => {
+                    const hourCard = document.createElement('div');
+                    hourCard.className = 'hour-card';
+                    
+                    let iconHtml = '';
+                    if (item.shadow_icon) {
+                        iconHtml = `<img src="${item.shadow_icon}" alt="Weather">`;
+                    }
+                    
+                    hourCard.innerHTML = `
+                        <div class="time">${item.time}:00</div>
+                        ${iconHtml}
+                        <div class="hour-temp">${item.temperature}°C</div>
+                        <div class="hour-desc">${item.status || ''}</div>
+                    `;
+                    hourlyGrid.appendChild(hourCard);
+                });
+            }
+
+            document.getElementById('weatherContainer').style.display = 'block';
+        }
+
+        // Tự động load thời tiết Hà Nội khi trang load
+        window.addEventListener('load', () => {
+            const hanoiCity = cities.find(city => city.name === 'Hà Nội');
+            if (hanoiCity) {
+                citySelect.value = hanoiCity.id;
+                getWeatherData(hanoiCity.id, hanoiCity.name);
+            }
+        });
+    </script>
+</body>
+</html>
